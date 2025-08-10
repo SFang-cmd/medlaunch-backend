@@ -6,7 +6,8 @@ import { config } from './config';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/logger';
-import reportsRouter from './api/reports';
+// import reportsRouter from './api/reports';
+import authRouter from './api/auth';
 
 const app = express();
 
@@ -33,7 +34,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.use('/api/reports', reportsRouter);
+app.use('/api/auth', authRouter);
+// app.use('/api/reports', reportsRouter);
 
 app.use('*', (req, res) => {
   res.status(404).json({
