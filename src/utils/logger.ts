@@ -6,14 +6,17 @@ const logFormat = winston.format.combine(
   winston.format.errors({ stack: true }),
   winston.format.json(),
   winston.format.printf(({ timestamp, level, message, requestId, userId, ...meta }) => {
-    const logEntry = {
+    const logEntry: Record<string, unknown> = {
       timestamp,
       level,
       message,
-      ...(requestId && { requestId }),
-      ...(userId && { userId }),
-      ...meta,
     };
+    
+    if (requestId) logEntry.requestId = requestId;
+    if (userId) logEntry.userId = userId;
+    
+    Object.assign(logEntry, meta);
+    
     return JSON.stringify(logEntry);
   })
 );

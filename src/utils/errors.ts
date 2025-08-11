@@ -1,7 +1,7 @@
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly code: string;
-  public readonly details?: Record<string, unknown>;
+  public readonly details: Record<string, unknown> | undefined;
   public readonly isOperational: boolean = true;
 
   constructor(message: string, statusCode: number, code: string, details?: Record<string, unknown>) {
@@ -17,6 +17,12 @@ export class AppError extends Error {
 export class ValidationError extends AppError {
   constructor(message: string, details?: Record<string, unknown>) {
     super(message, 400, 'VALIDATION_ERROR', details);
+  }
+}
+
+export class BadRequestError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super(message, 400, 'BAD_REQUEST', details);
   }
 }
 

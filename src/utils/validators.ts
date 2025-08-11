@@ -1,26 +1,25 @@
 import { z } from 'zod';
-import { ReportStatus, Priority, EntryType, EntryStatus } from '../models/report';
+import { SurveyType, SurveyStatus, AccreditationBody, DeficiencySeverity } from '../models/report';
 
 export const createReportSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
-  description: z.string().min(1, 'Description is required').max(2000, 'Description too long'),
-  businessKey: z.string().min(1, 'Business key is required').max(100, 'Business key too long'),
-  priority: z.nativeEnum(Priority).optional().default(Priority.MEDIUM),
-  assignedTo: z.string().uuid('Invalid user ID').optional(),
-  dueDate: z.string().datetime('Invalid date format').optional(),
-  tags: z.array(z.string().max(50, 'Tag too long')).max(20, 'Too many tags').optional().default([]),
-  metadata: z.record(z.unknown()).optional().default({}),
+  facilityId: z.string().min(1, 'Facility ID is required'),
+  surveyType: z.nativeEnum(SurveyType),
+  surveyDate: z.string().datetime('Invalid date format'),
+  leadSurveyor: z.string().min(1, 'Lead surveyor is required'),
+  surveyScope: z.array(z.string()).min(1, 'Survey scope is required'),
+  accreditationBody: z.nativeEnum(AccreditationBody),
+  correctiveActionDue: z.string().datetime('Invalid date format').optional(),
+  followUpRequired: z.boolean().optional().default(false),
 });
 
 export const updateReportSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long').optional(),
-  description: z.string().min(1, 'Description is required').max(2000, 'Description too long').optional(),
-  status: z.nativeEnum(ReportStatus).optional(),
-  priority: z.nativeEnum(Priority).optional(),
-  assignedTo: z.string().uuid('Invalid user ID').optional(),
-  dueDate: z.string().datetime('Invalid date format').optional(),
-  tags: z.array(z.string().max(50, 'Tag too long')).max(20, 'Too many tags').optional(),
-  metadata: z.record(z.unknown()).optional(),
+  surveyType: z.nativeEnum(SurveyType).optional(),
+  leadSurveyor: z.string().min(1).optional(),
+  surveyScope: z.array(z.string()).optional(),
+  complianceScore: z.number().min(0).max(100).optional(),
+  status: z.nativeEnum(SurveyStatus).optional(),
+  correctiveActionDue: z.string().datetime('Invalid date format').optional(),
+  followUpRequired: z.boolean().optional(),
 });
 
 export const reportQuerySchema = z.object({
@@ -28,16 +27,17 @@ export const reportQuerySchema = z.object({
   include: z.string().optional(),
   page: z.coerce.number().min(1).optional().default(1),
   limit: z.coerce.number().min(1).max(100).optional().default(20),
-  sortBy: z.enum(['createdAt', 'updatedAt', 'priority', 'status']).optional().default('updatedAt'),
+  sortBy: z.enum(['createdAt', 'updatedAt', 'complianceScore', 'status']).optional().default('updatedAt'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
-  status: z.nativeEnum(ReportStatus).optional(),
-  priority: z.nativeEnum(Priority).optional(),
+  status: z.nativeEnum(SurveyStatus).optional(),
+  surveyType: z.nativeEnum(SurveyType).optional(),
 });
 
-export const createEntrySchema = z.object({
-  content: z.string().min(1, 'Content is required').max(1000, 'Content too long'),
-  type: z.nativeEnum(EntryType).default(EntryType.NOTE),
-  priority: z.nativeEnum(Priority).default(Priority.MEDIUM),
+export const createDeficiencySchema = z.object({
+  standardCode: z.string().min(1, 'Standard code is required'),
+  description: z.string().min(1, 'Description is required'),
+  severity: z.nativeEnum(DeficiencySeverity),
+  dueDate: z.string().datetime('Invalid date format').optional(),
 });
 
 export const loginSchema = z.object({
@@ -55,6 +55,6 @@ export const paginationSchema = z.object({
 export type CreateReportInput = z.infer<typeof createReportSchema>;
 export type UpdateReportInput = z.infer<typeof updateReportSchema>;
 export type ReportQueryInput = z.infer<typeof reportQuerySchema>;
-export type CreateEntryInput = z.infer<typeof createEntrySchema>;
+export type CreateDeficiencyInput = z.infer<typeof createDeficiencySchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;
