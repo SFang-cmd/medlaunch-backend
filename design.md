@@ -113,6 +113,8 @@ enum UserRole {
 
 ## Custom Business Rule Implementation
 
+This API enforces a custom business rule to protect hospital accreditation data based on each report’s regulatory severity. Only users with the 'admin' role can edit reports marked with 'immediate_jeopardy' status due to their critical compliance impact. Reports labeled 'deficient' require an 'editor' or above for modifications, while lower-impact 'compliant' reports allow 'reader' access for note additions only. This rule is implemented through dedicated authorization middleware that validates the user's role against the report status before any edit action. By directly reflecting real-world governance needs, this rule safeguards critical survey data from unauthorized changes, ensures proper accountability, and influences both validation and API behavior.
+
 ### Primary Business Rule: Status-Based Edit Permissions
 
 **Rule Definition**: "Survey reports with 'immediate_jeopardy' status can only be edited by users with 'admin' role. Reports with 'deficient' status require 'editor' role or higher. Only 'compliant' reports can be edited by 'reader' role for adding notes."
