@@ -14,12 +14,13 @@ A Node.js TypeScript backend API for managing hospital accreditation survey repo
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm 8+
 
 ### Installation and Setup
 
 1. **Clone and Install Dependencies**
+
 ```bash
 git clone <repository-url>
 cd medlaunch-backend
@@ -27,11 +28,13 @@ npm install
 ```
 
 2. **Environment Configuration**
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` with your configuration:
+
 ```env
 # Server Configuration
 NODE_ENV=development
@@ -41,7 +44,7 @@ PORT=3000
 JWT_SECRET=your-super-secure-secret-key-here-make-it-long-and-random
 JWT_EXPIRES_IN=24h
 
-# File Upload Configuration  
+# File Upload Configuration
 MAX_FILE_SIZE=10485760
 UPLOAD_PATH=./uploads
 
@@ -50,6 +53,7 @@ LOG_LEVEL=info
 ```
 
 3. **Start Development Server**
+
 ```bash
 npm run dev
 ```
@@ -59,11 +63,13 @@ Server runs on `http://localhost:3000`
 ### Verify Installation
 
 Test the health endpoint:
+
 ```bash
 curl http://localhost:3000/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -94,6 +100,7 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -113,6 +120,7 @@ Response:
 ### Using the Token
 
 Include the token in the Authorization header for protected endpoints:
+
 ```bash
 Authorization: Bearer your-jwt-token-here
 ```
@@ -120,13 +128,15 @@ Authorization: Bearer your-jwt-token-here
 ## API Documentation and Examples
 
 ### Base URL
-```
+
+```bash
 http://localhost:3000/api
 ```
 
 ### 1. GET /reports/{id} - Retrieve Survey Report
 
 #### Basic Usage
+
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440100
@@ -135,30 +145,35 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 #### Advanced Query Examples
 
 **Executive Summary View**:
+
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   "http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440103?view=summary"
 ```
 
 **Selective Field Inclusion**:
+
 ```bash  
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   "http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440100?include=deficiencies,complianceScore"
 ```
 
 **Filtered Deficiencies**:
+
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   "http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440103?include=deficiencies&deficiencies.severity=immediate_jeopardy"
 ```
 
 **Paginated Results**:
+
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   "http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440103?include=deficiencies&page=1&limit=2"
 ```
 
 **Complex Combined Query**:
+
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   "http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440103?include=deficiencies&deficiencies.severity=major&deficiencies.sortBy=dueDate&page=1&limit=5"
@@ -185,6 +200,7 @@ curl -X POST http://localhost:3000/api/reports \
 ```
 
 Expected Response (201 Created):
+
 ```json
 {
   "success": true,
@@ -207,6 +223,7 @@ Expected Response (201 Created):
 **Required Role**: Editor or Admin (with status-based restrictions)
 
 #### Basic Update
+
 ```bash
 curl -X PUT http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440101 \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -219,11 +236,13 @@ curl -X PUT http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-4466554401
 ```
 
 #### Business Rule Enforcement
+
 - **Immediate Jeopardy reports** can only be edited by **Admin** users
 - **Deficient reports** can be edited by **Editor** and **Admin** users  
 - **Compliant reports** can be edited by all authenticated users
 
 #### Optimistic Concurrency Control
+
 Always include the current `version` number to prevent conflicts:
 
 ```bash
@@ -242,6 +261,7 @@ curl -X PUT http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-4466554401
 ```
 
 Expected Response (200 OK):
+
 ```json
 {
   "success": true,
@@ -260,6 +280,7 @@ Expected Response (200 OK):
 **Required Role**: Editor or Admin
 
 #### Upload Document
+
 ```bash
 curl -X POST http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440101/attachment \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -267,17 +288,20 @@ curl -X POST http://localhost:3000/api/reports/550e8400-e29b-41d4-a716-446655440
 ```
 
 #### Supported File Types
+
 - PDF documents (`.pdf`)
-- Word documents (`.doc`, `.docx`) 
+- Word documents (`.doc`, `.docx`)
 - Excel spreadsheets (`.xls`, `.xlsx`)
 - Images (`.jpg`, `.jpeg`, `.png`, `.tiff`)
 - Text files (`.txt`)
 
 #### File Size Limits
+
 - Maximum file size: **10MB** (configurable via `MAX_FILE_SIZE` env variable)
 - Single file per upload request
 
 Expected Response (201 Created):
+
 ```json
 {
   "success": true,
@@ -294,6 +318,7 @@ Expected Response (201 Created):
 ```
 
 #### Upload Validation Errors
+
 ```bash
 # File too large (413 Payload Too Large)
 curl -X POST http://localhost:3000/api/reports/REPORT_ID/attachment \
@@ -342,7 +367,7 @@ The system includes 5 sample hospital survey reports:
    - High performing with only 1 minor deficiency
 
 3. **Riverside Community Hospital** - Comprehensive Survey (Compliant)
-   - ID: `550e8400-e29b-41d4-a716-446655440102` 
+   - ID: `550e8400-e29b-41d4-a716-446655440102`
    - Perfect score with zero deficiencies
 
 4. **Metro General Hospital** - Patient Safety (Immediate Jeopardy)
@@ -386,35 +411,36 @@ npm run lint:fix
 
 ## Project Structure
 
-```
+```text
 src/
-   api/                   # API route handlers
-      auth/
-         index.ts       # Authentication routes  
-      reports/
-          index.ts       # Report CRUD routes
-   controllers/           # HTTP request controllers
-      authController.ts
-      reportController.ts  
-   services/              # Business logic layer
-      authService.ts
-      reportService.ts
-      reportRepository.ts # Sample data management
-      userRepository.ts
-   middleware/            # Express middleware
-      auth.ts           # Authentication & authorization
-      logger.ts         # Request logging
-      errorHandler.ts   # Global error handling
-   models/               # TypeScript interfaces  
-      report.ts
-      user.ts
-   utils/                # Utilities and helpers
-      validators.ts     # Zod validation schemas
-      errors.ts         # Custom error classes
-      logger.ts         # Winston logger setup
-   config/               # Configuration management
-      index.ts
-   app.ts               # Express application setup
+├── api/                   # API route handlers
+│   ├── auth/
+│   │   └── index.ts       # Authentication routes  
+│   └── reports/
+│       └── index.ts       # Report CRUD routes
+├── controllers/           # HTTP request controllers
+│   ├── authController.ts
+│   └── reportController.ts  
+├── services/              # Business logic layer
+│   ├── authService.ts
+│   ├── reportService.ts
+│   ├── reportRepository.ts # Sample data management
+│   └── userRepository.ts
+├── middleware/            # Express middleware
+│   ├── auth.ts           # Authentication & authorization
+│   ├── logger.ts         # Request logging
+│   ├── errorHandler.ts   # Global error handling
+│   └── upload.ts         # File upload handling
+├── models/               # TypeScript interfaces  
+│   ├── report.ts
+│   └── user.ts
+├── utils/                # Utilities and helpers
+│   ├── validators.ts     # Zod validation schemas
+│   ├── errors.ts         # Custom error classes
+│   └── logger.ts         # Winston logger setup
+├── config/               # Configuration management
+│   └── index.ts
+└── app.ts               # Express application setup
 ```
 
 ## Error Handling
@@ -437,6 +463,7 @@ All API errors follow a consistent format:
 ```
 
 Common error codes:
+
 - `VALIDATION_ERROR` - Invalid request data
 - `NOT_FOUND` - Resource does not exist  
 - `UNAUTHORIZED` - Missing or invalid authentication
@@ -469,13 +496,15 @@ npm run test -- --coverage
 ## Production Considerations
 
 ### Security
+
 - Change JWT secret to a strong random value
 - Enable HTTPS in production
 - Configure CORS for your frontend domain
-- Set up rate limiting  
+- Set up rate limiting
 - Enable request size limits
 
-### Performance  
+### Performance
+
 - Use a production database (MongoDB recommended)
 - Set up Redis for caching
 - Configure file storage (AWS S3, etc.)
@@ -483,12 +512,14 @@ npm run test -- --coverage
 - Set up CDN for static assets
 
 ### Monitoring
+
 - Configure structured logging destination
 - Set up health check monitoring
 - Enable error tracking (Sentry, etc.)
 - Monitor API performance metrics
 
 ### Deployment
+
 - Use Docker containers
 - Set up CI/CD pipeline
 - Configure environment-specific settings

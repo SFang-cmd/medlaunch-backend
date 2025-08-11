@@ -48,6 +48,7 @@ Based on actual hospital accreditation processes, each report contains:
 10. **`deficiencies: Deficiency[]`** - Array of deficiency objects
     - *Justification*: Core nested data structure that provides the "entries" requirement for complex formatting
     - **Structure**:
+
     ```typescript
     {
       id: string,                    // Unique identifier for individual deficiency
@@ -69,6 +70,7 @@ Based on actual hospital accreditation processes, each report contains:
     - *Why simple strings*: Avoids over-engineering with timestamps, authors, categories
 
 #### System Fields
+
 - **`createdAt/updatedAt: Date`** - Standard audit trail
 - **`version: number`** - Optimistic concurrency control for PUT operations
 
@@ -105,9 +107,9 @@ enum UserRole {
 
 | Role | Email | Password |
 |------|-------|----------|
-| Reader | reader@medlaunch.com | ReadPass123 |
-| Editor | editor@medlaunch.com | EditPass123 |
-| Admin | admin@medlaunch.com | AdminPass123 |
+| Reader | `reader@medlaunch.com` | ReadPass123 |
+| Editor | `editor@medlaunch.com` | EditPass123 |
+| Admin | `admin@medlaunch.com` | AdminPass123 |
 
 ## Custom Business Rule Implementation
 
@@ -135,32 +137,39 @@ enum UserRole {
 The API supports multiple output shapes: default hierarchical JSON with full nested arrays, executive summary view with computed metrics (?view=summary), and flattened compact view with essential fields only (?include=basic). This provides flexibility for different client needs - mobile apps can use compact view, dashboards use summary view, and full applications use default view.
 
 **Default View**: Rich hierarchical JSON with nested arrays
+
 ```http
 GET /reports/123
 ```
 
 **Executive Summary View**: Computed metrics with human-readable summary
+
 ```http
 GET /reports/123?view=summary
 ```
+
 Returns calculated fields like:
+
 - `riskLevel`: "high" | "medium" | "low"  
 - `keyMetrics`: Object with counts and percentages
 - `executiveSummary`: Generated text like "Survey found 3 deficiencies, 1 requiring immediate attention. Overall compliance score: 78%."
 
 **Compact/Flattened View**: Essential fields only
+
 ```http
 GET /reports/123?include=basic
 ```
 
 #### Selective Expansion/Inclusion of Subfields
 
-**Field Selection**: 
+**Field Selection**:
+
 ```http
 GET /reports/123?include=deficiencies,complianceScore,status
 ```
 
 **Multiple Fields**:
+
 ```http
 GET /reports/123?include=deficiencies,surveyorNotes,complianceScore
 ```
@@ -168,11 +177,13 @@ GET /reports/123?include=deficiencies,surveyorNotes,complianceScore
 #### Pagination for Large Nested Lists
 
 **Paginated Deficiencies**:
+
 ```http
 GET /reports/123?include=deficiencies&page=1&limit=5
 ```
 
 Returns pagination metadata:
+
 ```json
 {
   "items": [...],
@@ -189,16 +200,19 @@ Returns pagination metadata:
 #### Filtering/Sorting Inside Nested Collections
 
 **Filter by Severity**:
+
 ```http  
 GET /reports/123?deficiencies.severity=immediate_jeopardy
 ```
 
 **Sort by Due Date**:
+
 ```http
 GET /reports/123?deficiencies.sortBy=dueDate&deficiencies.order=asc  
 ```
 
 **Combined Complex Query**:
+
 ```http
 GET /reports/123?include=deficiencies&deficiencies.severity=major&deficiencies.sortBy=severity&page=1&limit=10
 ```
@@ -206,6 +220,7 @@ GET /reports/123?include=deficiencies&deficiencies.severity=major&deficiencies.s
 ### 2. PUT /reports/{id} - Idempotent Updates
 
 **Features Implemented**:
+
 - Full and partial update semantics
 - Optimistic concurrency control via version field  
 - Structured input validation with field-level error details
@@ -216,6 +231,7 @@ GET /reports/123?include=deficiencies&deficiencies.severity=major&deficiencies.s
 ### 3. POST /reports - Resource Creation
 
 **Features Implemented**:
+
 - Server-generated UUID identifiers
 - Business invariant enforcement (survey uniqueness per facility/year)
 - Input sanitization and validation  
@@ -229,6 +245,7 @@ GET /reports/123?include=deficiencies&deficiencies.severity=major&deficiencies.s
 ### 4. POST /reports/{id}/attachment - File Upload
 
 **Implementation Approach**:
+
 - Multipart file upload using Multer middleware
 - File type validation (MIME type checking)  
 - Size restrictions (configurable limits)
@@ -244,6 +261,7 @@ GET /reports/123?include=deficiencies&deficiencies.severity=major&deficiencies.s
 **Method**: Version-based conflict detection using monotonically increasing version numbers.
 
 **Implementation**:
+
 1. Each report includes a `version` field
 2. PUT requests must include the current version number
 3. Server increments version on successful updates
@@ -251,6 +269,7 @@ GET /reports/123?include=deficiencies&deficiencies.severity=major&deficiencies.s
 5. Client must refetch current version and retry
 
 **Advantages**:
+
 - High performance (no database locking)
 - Scales horizontally across multiple server instances
 - Clear semantics for conflict resolution
@@ -283,12 +302,14 @@ GET /reports/123?include=deficiencies&deficiencies.severity=major&deficiencies.s
 **Purpose**: Demonstrates async side effects that don't block main request flow
 
 **Features**:
+
 - Mock notification service simulating email/Slack alerts  
 - 10% artificial failure rate for realistic error handling
 - Non-blocking execution (notification failures don't fail main request)
 - Proper error logging for monitoring
 
 **Failure Handling Strategy**:
+
 ```typescript
 triggerAsyncNotification(report, userId).catch(error => {
   logger.error('Notification failed', error);
@@ -297,6 +318,7 @@ triggerAsyncNotification(report, userId).catch(error => {
 ```
 
 **Production Extensions**:
+
 - Retry logic with exponential backoff
 - Dead letter queue for failed notifications  
 - Circuit breaker pattern for service resilience
@@ -305,31 +327,37 @@ triggerAsyncNotification(report, userId).catch(error => {
 ## Code Quality Practices
 
 ### Type Safety and Validation
+
 - **TypeScript**: Strict mode enabled with comprehensive type checking
 - **Zod Schemas**: Runtime validation for all API inputs with detailed error messages
 - **Interface Contracts**: Clear separation between internal models and API contracts
 
 ### Architecture and Organization  
-- **Layered Architecture**: Clean separation of Controller ’ Service ’ Repository layers
+
+- **Layered Architecture**: Clean separation of Controller ï¿½ Service ï¿½ Repository layers
 - **Single Responsibility**: Each module has one clear purpose
 - **Dependency Injection**: Services can be easily mocked for testing
 
 ### Error Handling
+
 - **Custom Error Classes**: Structured error types with HTTP status codes
 - **Consistent Response Format**: All errors follow same JSON structure  
 - **Client-Friendly Messages**: Actionable error descriptions
 
 ### Linting and Static Analysis
+
 - **ESLint**: Enforced code style and quality rules
 - **TypeScript Compiler**: Strict type checking with exactOptionalPropertyTypes
 - **Import Organization**: Consistent module import structure
 
 ### Testing Philosophy  
+
 - **Test Pyramid**: Unit tests for business logic, integration tests for API endpoints
 - **Realistic Data**: Sample hospital survey data based on actual accreditation scenarios
 - **Mocking Strategy**: External services mocked, core business logic tested directly
 
 ### Logging and Observability
+
 - **Structured Logging**: JSON format with consistent fields across all services
 - **Request Correlation**: Request IDs for tracing requests across service layers
 - **Context Logging**: User ID, action type, and resource information included
@@ -347,7 +375,8 @@ triggerAsyncNotification(report, userId).catch(error => {
 
 ### Thoughtful Data Access
 
-**Indexing Strategy**: 
+**Indexing Strategy**:
+
 - Primary index on report ID (UUID)
 - Composite index on facilityId + surveyType + surveyDate
 - Secondary indexes on status and complianceScore for dashboard queries
@@ -379,15 +408,19 @@ I used Express because during my initial conversation with Robert, he mentioned 
 ## Evolution and Next Steps
 
 ### API Versioning Strategy
+
 Header-based versioning would support backward compatibility as the API evolves
 
-### Additional Survey Types  
+### Additional Survey Types
+
 New survey types can be added by extending the SurveyType enum with automatic validation
 
 ### Advanced Metrics
+
 Plugin architecture would allow hot-swappable metric calculation modules
 
 ### Production Deployment
+
 - Containerization with Docker multi-stage builds
 - Infrastructure as Code using Terraform
 - CI/CD pipeline with automated testing and deployment
