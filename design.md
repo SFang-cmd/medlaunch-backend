@@ -8,7 +8,7 @@ This project implements a hospital accreditation survey management API using Nod
 
 ### Core Entity: Hospital Accreditation Survey Report
 
-The system centers around **Survey Reports** - documents that capture the results of accreditation surveys conducted at healthcare facilities by organizations like the Joint Commission. The schema is based on the actual hospital accreditation processes, which I did research on to simulate a realistic use case of a backend API for Medlaunch.
+The system centers around **Survey Reports** - documents that capture the results of accreditation surveys conducted at healthcare facilities by organizations like the Joint Commission. The schema is based on the actual hospital accreditation processes, which I did research on to simulate a realistic use case of a backend API for Medlaunch. Although the actual fields may be slightly incorrect, as I am not too familiar with medical accreditation processes, I did my best to simulate a realistic use case and create fields that both showcase my programming versatility while maintaining an authentic use case that may be rationalized by Medlaunch employees and higher-ups who have knowledge of hospital management practices.
 
 #### Report Interface (13 Fields)
 
@@ -113,7 +113,7 @@ enum UserRole {
 
 ## Custom Business Rule Implementation
 
-This API enforces a custom business rule to protect hospital accreditation data based on each report’s regulatory severity. Only users with the 'admin' role can edit reports marked with 'immediate_jeopardy' status due to their critical compliance impact. Reports labeled 'deficient' require an 'editor' or above for modifications, while lower-impact 'compliant' reports allow 'reader' access for note additions only. This rule is implemented through dedicated authorization middleware that validates the user's role against the report status before any edit action. By directly reflecting real-world governance needs, this rule safeguards critical survey data from unauthorized changes, ensures proper accountability, and influences both validation and API behavior.
+In the context of a hospital accreditation system, I thought about business rules that would directly mirror the hierarchical control a hospital may have, where higher managers may need more fine-grained control over reports and more access, while common workers may only need to grab reports and check specific aspects or specific reports only. As such, this API enforces a custom business rule to protect hospital accreditation data based on each report’s regulatory severity. Only users with the 'admin' role can edit reports marked with 'immediate_jeopardy' status due to their critical compliance impact. Reports labeled 'deficient' require an 'editor' or above for modifications, while lower-impact 'compliant' reports allow 'reader' access for note additions only. This rule is implemented through dedicated authorization middleware that validates the user's role against the report status before any edit action. By directly reflecting real-world governance needs, this rule safeguards critical survey data from unauthorized changes, ensures proper accountability, and influences both validation and API behavior.
 
 ### Primary Business Rule: Status-Based Edit Permissions
 
@@ -327,6 +327,8 @@ triggerAsyncNotification(report, userId).catch(error => {
 - Message queue integration (Redis, RabbitMQ, AWS SQS)
 
 ## Code Quality Practices
+
+Throughout this challenge, I make sure to implement rigorous code quality practices that ensure maintainability and conform to standards in the current industry. This includes many type safety and validation practices, as well as architecture and organization best practices such as:
 
 ### Type Safety and Validation
 
