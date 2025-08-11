@@ -3,12 +3,19 @@
 ## Architecture Decisions
 
 ### **Express.js Framework Choice**
+
 I used Express because during my initial conversation with Robert, he mentioned that Medlaunch Concepts currently uses the MERN stack, which expressly uses Express.js as part of its stack. For larger production systems, I would consider switching to NestJS, which is a more modern and feature-rich framework that is built on top of Express.js. However, Express demonstrates the same underlying patterns that would be used in NestJS and demonstrates the underlying patterns without framework abstraction.
 
 ### **No Database/Repository Subdirectories**
-Mention the fact that we don't include databases or repositories subdirectories, since these are not being set up. If these were, then we would need to set up those directories.
+
+We don't include databases or repositories subdirectories, since these are not being set up. If these were, then we would need to set up those directories, but for the sake of the challenge, we will use sample data, as the service/business logic seems more important.
+
+The database repository sample data is structured in arrays of json objects, with each object representing a report. Assuming we use a NoSQL structure, this structure mirrors directly what a MongoDB framework would query from.
+
+Although we use arrays for ease of implementation, for production scale with thousands of reports, I would implement a Map-based lookup cache for O(1) ID access while maintaining the array for iteration and filtering operations, similar to how MongoDB would implement an index/report ID.
 
 ### **Authentication Model**
+
 User for login and authentication, just setting standard "reader", "writer", and "admin" roles.
 
 ## Core Report Structure - Hospital Accreditation Survey
@@ -95,6 +102,21 @@ User for login and authentication, just setting standard "reader", "writer", and
 - **surveyScope: string[]** instead of enum-based objects
 - **surveyorNotes: string[]** instead of timestamped/categorized objects
 - *Justification*: Flexibility without premature optimization - easier to query and display
+
+## API Endpoints
+
+### **Get Reports Parameters***
+
+The API supports multiple output shapes: default hierarchical JSON with full nested arrays, executive summary view with computed metrics (?view=summary), and flattened compact view with essential fields only (?include=basic). This provides flexibility for different client needs - mobile apps can use compact view, dashboards use summary view, and full applications use default view.
+
+The get reports endpoint has a number of parameters that can be used to filter the results. These parameters are:
+
+- `view`: The view to return. Can be "default" or "summary". Default is "default". "Summary" returns a summary of the report with key metrics and an `executiveSummary` field, while "default" returns the full report.
+- `include`: The fields to include. Can be a comma separated list of fields. The "basic" parameter can be used, to view a "flattened" version of the data with only select fields.
+- `page`: The page number to return. Default is 1.
+- `limit`: The number of results to return. Default is 20.
+- `sortBy`: The field to sort by. Default is "updatedAt".
+- `sortOrder`: The order to sort by. Can be "asc" or "desc". Default is "desc".
 
 ## Business Rules Enabled by This Structure
 
