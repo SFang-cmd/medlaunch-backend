@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { getReportById, getAllReports, createNewReport, updateReportById } from '../services/reportService';
 import { uuidSchema, reportQuerySchema, createReportSchema, updateReportSchema } from '../utils/validators';
 import { createLogger } from '../utils/logger';
 import { BadRequestError } from '../utils/errors';
 
-export const getReport = async (req: Request, res: Response): Promise<void> => {
+export const getReport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const logger = createLogger({ 
     requestId: req.headers['x-request-id'] as string,
     userId: (req as any).user?.id,
@@ -48,11 +48,11 @@ export const getReport = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     logger.error('Failed to get report', error as Error, { reportId: req.params.id });
-    throw error; // Let error middleware handle it
+    next(error); // Pass to error middleware
   }
 };
 
-export const getReports = async (req: Request, res: Response): Promise<void> => {
+export const getReports = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const logger = createLogger({ 
     requestId: req.headers['x-request-id'] as string,
     userId: (req as any).user?.id,
@@ -75,11 +75,11 @@ export const getReports = async (req: Request, res: Response): Promise<void> => 
     });
   } catch (error) {
     logger.error('Failed to get reports', error as Error);
-    throw error;
+    next(error);
   }
 };
 
-export const createReport = async (req: Request, res: Response): Promise<void> => {
+export const createReport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const logger = createLogger({ 
     requestId: req.headers['x-request-id'] as string,
     userId: (req as any).user?.id,
@@ -119,11 +119,11 @@ export const createReport = async (req: Request, res: Response): Promise<void> =
     logger.error('Failed to create report', error as Error, { 
       requestBody: req.body 
     });
-    throw error;
+    next(error);
   }
 };
 
-export const updateReport = async (req: Request, res: Response): Promise<void> => {
+export const updateReport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const logger = createLogger({ 
     requestId: req.headers['x-request-id'] as string,
     userId: (req as any).user?.id,
@@ -170,11 +170,11 @@ export const updateReport = async (req: Request, res: Response): Promise<void> =
       reportId: req.params.id,
       requestBody: req.body 
     });
-    throw error;
+    next(error);
   }
 };
 
-export const uploadAttachment = async (req: Request, res: Response): Promise<void> => {
+export const uploadAttachment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const logger = createLogger({ 
     requestId: req.headers['x-request-id'] as string,
     userId: (req as any).user?.id,
@@ -250,6 +250,6 @@ export const uploadAttachment = async (req: Request, res: Response): Promise<voi
         mimetype: req.file.mimetype
       } : null
     });
-    throw error;
+    next(error);
   }
 };
