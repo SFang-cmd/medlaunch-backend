@@ -8,11 +8,11 @@ This project implements a hospital accreditation survey management API using Nod
 
 ### Core Entity: Hospital Accreditation Survey Report
 
-The system centers around **Survey Reports** - documents that capture the results of accreditation surveys conducted at healthcare facilities by organizations like the Joint Commission.
+The system centers around **Survey Reports** - documents that capture the results of accreditation surveys conducted at healthcare facilities by organizations like the Joint Commission. The schema is based on the actual hospital accreditation processes, which I did research on to simulate a realistic use case of a backend API for Medlaunch.
 
 #### Report Interface (13 Fields)
 
-Based on actual hospital accreditation processes, each report contains:
+Based on actual hospital accreditation processes, each report contains some of the most important fields for a survey report, which tracks a hospital's required inspections, surveys, and any other regulatory requirements when being assessed for certification.
 
 1. **`id: string`** - Unique survey report identifier
    - *Justification*: Primary key for REST API endpoints, enables direct access via GET /reports/{id}
@@ -76,7 +76,7 @@ Based on actual hospital accreditation processes, each report contains:
 
 ### Data Storage Design
 
-We don't include databases or repositories subdirectories, since these are not being set up. If these were, then we would need to set up those directories, but for the sake of the challenge, we will use sample data, as the service/business logic seems more important.
+The challenge asks for a NoSQL format without the actual database, so to ensure full functionality, I developed in-storage repository to simulate writing and reading from a NoSQL database such as MongoDB. Because the repository also returns JSON/dictionary formatted files, it is easily translatable to MongoDB and any other document-based database.
 
 The database repository sample data is structured in arrays of json objects, with each object representing a report. Assuming we use a NoSQL structure, this structure mirrors directly what a MongoDB framework would query from.
 
@@ -154,9 +154,9 @@ Returns calculated fields like:
 
 - `riskLevel`: "high" | "medium" | "low"  
 - `keyMetrics`: Object with counts and percentages
-- `executiveSummary`: Generated text like "Survey found 3 deficiencies, 1 requiring immediate attention. Overall compliance score: 78%."
+- `executiveSummary`: Generated text like "Survey found 3 deficiencies, 1 requiring immediate attention. Overall compliance score: 78%." This is very much similar to the requested human-readable summary from the document.
 
-**Compact/Flattened View**: Essential fields only
+**Compact/Flattened View**: Essential fields only, which conforms with the "executive summary" request from the document, as it is flattened.
 
 ```http
 GET /reports/123?include=basic
